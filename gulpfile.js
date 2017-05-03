@@ -29,8 +29,18 @@ const sources = {
   },
   js: {
     listApp: 'src/app/index.js'
+  },
+  img: {
+    png: 'src/assets/img/*.png'
   }
 };
+
+
+gulp.task('png-images', () => {
+  return gulp.src(sources.img.png)
+    .on('error', interceptErrors)
+    .pipe(gulp.dest(buildDir));
+});
 
 
 gulp.task('css', () => {
@@ -60,7 +70,7 @@ gulp.task('listingApp', () => {
 
 });
 
-gulp.task('build', ['css', 'listingPage', 'listingApp'], () => {
+gulp.task('build', ['css', 'png-images', 'listingPage', 'listingApp'], () => {
 
   let css = gulp.src(`${buildDir}/bundle.css`)
       .pipe(gulp.dest(outDir));
@@ -71,6 +81,9 @@ gulp.task('build', ['css', 'listingPage', 'listingApp'], () => {
   let listApp = gulp.src(`${buildDir}/index.js`)
       .pipe(gulp.dest(outDir));
 
-  return merge(css, listPage, listApp);
+  let png = gulp.src("build/*.png")
+      .pipe(gulp.dest(outDir));
+
+  return merge(css, png, listPage, listApp);
 });
 
