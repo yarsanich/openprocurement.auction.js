@@ -1,0 +1,4 @@
+.couchapprc
+_attachments
+build
+node_modules
