@@ -2,7 +2,7 @@ export default function ListingController($scope, $http) {
   /*@ngInject;*/
   
   let url = location.protocol + '//' + location.host + '/auctions'; 
-  let newLocation = url + '/_design/auction-app/_view/listing';
+  let newLocation = url + '/_design/auctions/_view/by_endDate';
   $http({
     method: 'GET',
     url: newLocation,
