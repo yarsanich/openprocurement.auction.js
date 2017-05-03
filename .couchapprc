@@ -1,0 +1,5 @@
+{ "env":
+    { "default":
+        {  "db":"http://admin:audmin@127.0.0.1:9000/auctions" }
+    }
+}
