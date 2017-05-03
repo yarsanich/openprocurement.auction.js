@@ -20,6 +20,9 @@ const outDir = '_attachments/';
 
 const sources = {
   styles: 'src/**/*.css',
+  html: {
+    indexPage: 'templates/index.html'
+  }
 };
 
 
@@ -32,10 +35,20 @@ gulp.task('css', () => {
 });
 
 
-gulp.task('build', ['css'], () => {
+gulp.task('listingPage', () => {
+    return gulp.src(sources.html.indexPage)
+      .on('error', interceptErrors)
+      .pipe(gulp.dest(buildDir));
+})
+
+
+gulp.task('build', ['css', 'listingPage'], () => {
 
   let css = gulp.src(`${buildDir}/bundle.css`)
       .pipe(gulp.dest(outDir));
-  return merge(css);
+
+  let listPage = gulp.src(`${buildDir}/index.html`)
+      .pipe(gulp.dest(outDir));
+  return merge(css, listPage);
 });
 
