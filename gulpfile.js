@@ -1,7 +1,11 @@
 const gulp          = require('gulp'),
       notify        = require('gulp-notify'),
       concat        = require('gulp-concat'),
+      source        = require('vinyl-source-stream'),
       cleanCSS      = require('gulp-clean-css'),
+      browserify    = require('browserify'),
+      babelify      = require('babelify'),
+      ngAnnotate    = require('browserify-ngannotate'),
       merge         = require('merge-stream');
 
 function  interceptErrors(error) {
@@ -22,6 +26,9 @@ const sources = {
   styles: 'src/**/*.css',
   html: {
     indexPage: 'templates/index.html'
+  },
+  js: {
+    listApp: 'src/app/index.js'
   }
 };
 
@@ -39,16 +46,31 @@ gulp.task('listingPage', () => {
     return gulp.src(sources.html.indexPage)
       .on('error', interceptErrors)
       .pipe(gulp.dest(buildDir));
-})
+});
 
+gulp.task('listingApp', () => {
+  let b = browserify({entries: sources.js.listApp});
+  return b
+    .transform(babelify, {presets: ["es2015"]})
+    .transform(ngAnnotate)
+    .bundle()
+    .on('error', interceptErrors)
+    .pipe(source('index.js'))
+    .pipe(gulp.dest(buildDir));
 
-gulp.task('build', ['css', 'listingPage'], () => {
+});
+
+gulp.task('build', ['css', 'listingPage', 'listingApp'], () => {
 
   let css = gulp.src(`${buildDir}/bundle.css`)
       .pipe(gulp.dest(outDir));
 
   let listPage = gulp.src(`${buildDir}/index.html`)
       .pipe(gulp.dest(outDir));
-  return merge(css, listPage);
+
+  let listApp = gulp.src(`${buildDir}/index.js`)
+      .pipe(gulp.dest(outDir));
+
+  return merge(css, listPage, listApp);
 });
 
