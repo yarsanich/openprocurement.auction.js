@@ -25,10 +25,12 @@ const outDir = '_attachments/';
 const sources = {
   styles: 'src/**/*.css',
   html: {
-    indexPage: 'templates/index.html'
+    indexPage: 'templates/index.html',
+    archivePage: 'templates/archive.html'
   },
   js: {
-    listApp: 'src/app/index.js'
+    listApp: 'src/app/index.js',
+    archiveApp: 'src/app/archive.js'
   },
   img: {
     png: 'src/assets/img/*.png'
@@ -58,6 +60,14 @@ gulp.task('listingPage', () => {
       .pipe(gulp.dest(buildDir));
 });
 
+gulp.task('archivePage', () => {
+    return gulp.src(sources.html.archivePage)
+      .on('error', interceptErrors)
+      .pipe(gulp.dest(buildDir));
+});
+
+
+
 gulp.task('listingApp', () => {
   let b = browserify({entries: sources.js.listApp});
   return b
@@ -70,7 +80,19 @@ gulp.task('listingApp', () => {
 
 });
 
-gulp.task('build', ['css', 'png-images', 'listingPage', 'listingApp'], () => {
+gulp.task('archiveApp', () => {
+  let b = browserify({entries: sources.js.archiveApp});
+  return b
+    .transform(babelify, {presets: ["es2015"]})
+    .transform(ngAnnotate)
+    .bundle()
+    .on('error', interceptErrors)
+    .pipe(source('archive.js'))
+    .pipe(gulp.dest(buildDir));
+});
+
+
+gulp.task('build', ['css', 'png-images', 'listingPage', 'listingApp', 'archivePage', 'archiveApp'], () => {
 
   let css = gulp.src(`${buildDir}/bundle.css`)
       .pipe(gulp.dest(outDir));
@@ -79,6 +101,12 @@ gulp.task('build', ['css', 'png-images', 'listingPage', 'listingApp'], () => {
       .pipe(gulp.dest(outDir));
 
   let listApp = gulp.src(`${buildDir}/index.js`)
+      .pipe(gulp.dest(outDir));
+
+  let archivePage = gulp.src(`${buildDir}/archive.html`)
+      .pipe(gulp.dest(outDir));
+
+  let archiveApp = gulp.src(`${buildDir}/archive.js`)
       .pipe(gulp.dest(outDir));
 
   let png = gulp.src("build/*.png")
