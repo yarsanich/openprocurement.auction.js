@@ -1,11 +1,15 @@
 const gulp          = require('gulp'),
       notify        = require('gulp-notify'),
       concat        = require('gulp-concat'),
+      bower         = require('gulp-bower'),
+      vendorFiles   = require('gulp-main-bower-files'),
+      gulpFilter    = require('gulp-filter'),
       source        = require('vinyl-source-stream'),
       cleanCSS      = require('gulp-clean-css'),
       browserify    = require('browserify'),
       babelify      = require('babelify'),
       ngAnnotate    = require('browserify-ngannotate'),
+      fileinclude   = require('gulp-file-include'),
       merge         = require('merge-stream');
 
 function  interceptErrors(error) {
@@ -15,8 +19,7 @@ function  interceptErrors(error) {
     message: '<%= error.message %>'
   }).apply(this, args);
   this.emit('end');
-};
-
+}
 
 const buildDir = 'build/';
 const outDir = '_attachments/';
@@ -26,22 +29,39 @@ const sources = {
   styles: 'src/**/*.css',
   html: {
     indexPage: 'templates/index.html',
-    archivePage: 'templates/archive.html'
+    archivePage: 'templates/archive.html',
+    auctionPage: 'templates/tender.html'
   },
   js: {
     listApp: 'src/app/index.js',
-    archiveApp: 'src/app/archive.js'
+    archiveApp: 'src/app/archive.js',
+    auctionApp: 'src/app/auction.js',
   },
   img: {
     png: 'src/assets/img/*.png'
   }
 };
 
+gulp.task('bower', () => {
+  return bower();
+});
+
 
 gulp.task('png-images', () => {
   return gulp.src(sources.img.png)
     .on('error', interceptErrors)
     .pipe(gulp.dest(buildDir));
+});
+
+
+gulp.task('all-js', () => {
+    let filterJS = gulpFilter('**/*.js', { restore: true });
+    return gulp.src('./bower.json')
+    .pipe(vendorFiles({base: "src/lib"}))
+        .pipe(filterJS)
+        .pipe(concat('vendor.js'))
+        .pipe(filterJS.restore)
+        .pipe(gulp.dest(buildDir));
 });
 
 
@@ -66,6 +86,11 @@ gulp.task('archivePage', () => {
       .pipe(gulp.dest(buildDir));
 });
 
+gulp.task('auctionPage', () => {
+    return gulp.src(sources.html.auctionPage)
+      .on('error', interceptErrors)
+      .pipe(gulp.dest(buildDir));
+});
 
 
 gulp.task('listingApp', () => {
@@ -91,8 +116,19 @@ gulp.task('archiveApp', () => {
     .pipe(gulp.dest(buildDir));
 });
 
+gulp.task('auctionApp', () => {
+  let b = browserify({entries: sources.js.auctionApp});
+  return b
+    .transform(babelify, {presets: ["es2015"]})
+    .transform(ngAnnotate)
+    .bundle()
+    .on('error', interceptErrors)
+    .pipe(source('auction.js'))
+    .pipe(gulp.dest(buildDir));
+});
 
-gulp.task('build', ['css', 'png-images', 'listingPage', 'listingApp', 'archivePage', 'archiveApp'], () => {
+
+gulp.task('build', ['bower', 'all-js', 'css', 'png-images', 'listingPage', 'listingApp', 'archivePage', 'archiveApp', 'auctionApp', 'auctionPage'], () => {
 
   let css = gulp.src(`${buildDir}/bundle.css`)
       .pipe(gulp.dest(outDir));
@@ -103,15 +139,25 @@ gulp.task('build', ['css', 'png-images', 'listingPage', 'listingApp', 'archivePa
   let listApp = gulp.src(`${buildDir}/index.js`)
       .pipe(gulp.dest(outDir));
 
+  let vendor_js = gulp.src(`${buildDir}/vendor.js`)
+      .pipe(gulp.dest(outDir));
+
   let archivePage = gulp.src(`${buildDir}/archive.html`)
       .pipe(gulp.dest(outDir));
 
   let archiveApp = gulp.src(`${buildDir}/archive.js`)
       .pipe(gulp.dest(outDir));
 
+  let auctionPage = gulp.src(`${buildDir}/tender.html`)
+      .pipe(gulp.dest(outDir));
+
+  let auctionApp = gulp.src(`${buildDir}/auction.js`)
+      .pipe(gulp.dest(outDir));
+
   let png = gulp.src("build/*.png")
       .pipe(gulp.dest(outDir));
 
-  return merge(css, png, listPage, listApp);
+  return merge(css, png, listPage, listApp, vendor_js, auctionPage, auctionApp);
 });
+
 
