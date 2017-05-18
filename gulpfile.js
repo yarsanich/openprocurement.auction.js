@@ -3,6 +3,7 @@ const gulp          = require('gulp'),
       concat        = require('gulp-concat'),
       bower         = require('gulp-bower'),
       vendorFiles   = require('gulp-main-bower-files'),
+      minify        = require('gulp-minify'),
       gulpFilter    = require('gulp-filter'),
       source        = require('vinyl-source-stream'),
       cleanCSS      = require('gulp-clean-css'),
@@ -10,6 +11,7 @@ const gulp          = require('gulp'),
       babelify      = require('babelify'),
       ngAnnotate    = require('browserify-ngannotate'),
       fileinclude   = require('gulp-file-include'),
+      uglify        = require('gulp-uglify'),
       merge         = require('merge-stream');
 
 function  interceptErrors(error) {
@@ -26,7 +28,8 @@ const outDir = '_attachments/';
 
 
 const sources = {
-  styles: 'src/**/*.css',
+  styles: ['src/assets/css/starter-template.css', 'src/lib/angular-growl-2/build/angular-growl.min.css'],
+  fonts: 'src/assets/fonts/*',
   html: {
     indexPage: 'templates/index.html',
     archivePage: 'templates/archive.html',
@@ -38,12 +41,21 @@ const sources = {
     auctionApp: 'src/app/auction.js',
   },
   img: {
-    png: 'src/assets/img/*.png'
+    png: 'src/assets/img/*.png',
+    icons: 'src/assets/img/img/*.png'
   }
 };
 
+
 gulp.task('bower', () => {
   return bower();
+});
+
+
+gulp.task('fonts', () => {
+  return gulp.src(sources.fonts)
+    .on('error', interceptErrors)
+    .pipe(gulp.dest(buildDir+'/fonts/'));
 });
 
 
@@ -54,14 +66,30 @@ gulp.task('png-images', () => {
 });
 
 
-gulp.task('all-js', () => {
-    let filterJS = gulpFilter('**/*.js', { restore: true });
-    return gulp.src('./bower.json')
-    .pipe(vendorFiles({base: "src/lib"}))
-        .pipe(filterJS)
-        .pipe(concat('vendor.js'))
-        .pipe(filterJS.restore)
-        .pipe(gulp.dest(buildDir));
+gulp.task('icons', () => {
+  return gulp.src(sources.img.icons)
+    .on('error', interceptErrors)
+    .pipe(gulp.dest(buildDir+'/img/'));
+});
+
+
+gulp.task('bower-main', () => {
+  return allJs = gulp.src('./bower.json')
+      .pipe(vendorFiles({
+        base: "src/lib",}))
+      .pipe(gulpFilter('**/*.js'))
+      .pipe(gulp.dest(buildDir + '/vendor/'));
+
+});
+
+
+gulp.task('all-js', ['bower-main'], () => {
+  return gulp.src([
+    buildDir + '/vendor/**/*.js',
+    './src/lib/moment/locale/uk.js',
+    './src/lib/moment/locale/ru.js'])
+    .pipe(concat('vendor.js'))
+    .pipe(gulp.dest(buildDir));
 });
 
 
@@ -128,10 +156,10 @@ gulp.task('auctionApp', () => {
 });
 
 
-gulp.task('build', ['bower', 'all-js', 'css', 'png-images', 'listingPage', 'listingApp', 'archivePage', 'archiveApp', 'auctionApp', 'auctionPage'], () => {
+gulp.task('build', ['bower', 'all-js', 'css', 'png-images', 'icons', 'listingPage', 'listingApp', 'archivePage', 'archiveApp', 'auctionApp', 'auctionPage', 'fonts'], () => {
 
   let css = gulp.src(`${buildDir}/bundle.css`)
-      .pipe(gulp.dest(outDir));
+      .pipe(gulp.dest(outDir + '/css/'));
 
   let listPage = gulp.src(`${buildDir}/index.html`)
       .pipe(gulp.dest(outDir));
@@ -157,7 +185,18 @@ gulp.task('build', ['bower', 'all-js', 'css', 'png-images', 'listingPage', 'list
   let png = gulp.src("build/*.png")
       .pipe(gulp.dest(outDir));
 
-  return merge(css, png, listPage, listApp, vendor_js, auctionPage, auctionApp);
+  let icons = gulp.src("build/img/*.png")
+      .pipe(gulp.dest(outDir+'/img/'));
+
+
+  let fonts = gulp.src("build/fonts/*")
+      .pipe(gulp.dest(outDir+'/static/fonts/'));
+ 
+  let fonts2 = gulp.src("build/fonts/*")
+      .pipe(gulp.dest(outDir+'/fonts/'));
+
+
+  return merge(css, png, fonts, listPage, listApp, vendor_js, auctionPage, auctionApp, fonts, fonts2, icons);
 });
 
 
