@@ -26,14 +26,13 @@ const appRequires = [
 let app = angular.module('auction', appRequires),
     db = {},
     bidder_id = "0",
-    auction_doc_id = auction_doc_id || "",
     db_url = (location.protocol + '//' + location.host + '/auctions/' ) || "",
     evtSrc = {},
     dataLayer = dataLayer || [];
 
+
 app
   .constant('AuctionConfig', {
-    auction_doc_id: auction_doc_id,
     remote_db: db_url,
     restart_retries: 10,
     default_lang: 'uk',

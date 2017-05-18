@@ -8,6 +8,20 @@ export default function AuctionController(
     window.open(location.href, '_blank');
     return false;
   }
+  AuctionConfig.auction_doc_id = window.location.pathname.replace('/tenders/', '');
+  $scope.$watch(function() {
+    return $location.path().replace('/', '');
+  }, function(oldValue, newValue) {
+    $log.info({
+      message: "reload auction",
+      oldDoc: oldValue,
+      newAuction: newValue
+    });
+    if (oldValue !== newValue) {
+      $window.location.reload();
+    }
+  });
+  $log.info($location.path());
   $scope.lang = 'uk';
   $rootScope.normilized = false;
   $rootScope.format_date = AuctionUtils.format_date;
@@ -338,7 +352,7 @@ export default function AuctionController(
   $scope.sync_times_with_server = function(start) {
     $http.get('/get_current_server_time', {
       'params': {
-        '_nonce': Math.random().toString()
+        //'_nonce': Math.random().toString()
       }
     }).success(function(data, status, headers, config) {
       $scope.last_sync = new Date(new Date(headers().date));
@@ -547,6 +561,7 @@ export default function AuctionController(
   $scope.calculate_minimal_bid_amount = function() {
     if ((angular.isObject($scope.auction_doc)) && (angular.isArray($scope.auction_doc.stages)) && (angular.isArray($scope.auction_doc.initial_bids))) {
       var bids = [];
+      var filter_func;
       if ($scope.auction_doc.auction_type == 'meat') {
         filter_func = function(item, index) {
           if (!angular.isUndefined(item.amount_features)) {

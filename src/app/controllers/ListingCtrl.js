@@ -3,7 +3,7 @@ export default function ListingController($scope, $http) {
 
   let url = location.protocol + '//' + location.host + '/auctions/';
   let newLocation = url + '/_design/auctions/_view/by_endDate';
-  $scope.url = url;
+  $scope.url = location.protocol + '//' + location.host + '/tenders';
   $http({
     method: 'GET',
     url: newLocation,
