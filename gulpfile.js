@@ -97,7 +97,7 @@ gulp.task('css', () => {
 });
 
 gulp.task('htmlPages', () => {
-  let streams = sources.html.map((page) => {
+  return merge(sources.html.map((page) => {
     return gulp.src('./templates/base.html')
     .pipe(fileinclude({
       prefix: '@@',
@@ -107,7 +107,7 @@ gulp.task('htmlPages', () => {
     .pipe(rename(page.name +'.html'))
     .pipe(gulp.dest(buildDir));
 
-  });
+  }));
 });
 
 
