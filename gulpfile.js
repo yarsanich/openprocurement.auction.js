@@ -11,6 +11,7 @@ const gulp          = require('gulp'),
       ngAnnotate    = require('browserify-ngannotate'),
       fileinclude   = require('gulp-file-include'),
       uglify        = require('gulp-uglify'),
+      rename        = require("gulp-rename"),
       merge         = require('merge-stream');
 
 function  interceptErrors(error) {
@@ -29,11 +30,11 @@ const outDir = '_attachments/';
 const sources = {
   styles: ['src/assets/css/starter-template.css', 'src/lib/angular-growl-2/build/angular-growl.min.css'],
   fonts: 'src/assets/fonts/*',
-  html: {
-    indexPage: 'templates/index.html',
-    archivePage: 'templates/archive.html',
-    auctionPage: 'templates/tender.html'
-  },
+  html: [
+    {name: 'index', scripts: ["index.js"], title: "Auction Software"},
+    {name: 'archive', scripts: ["archive.js"], title: "Auction Software"},
+    {name: 'tender', scripts: ["auction.js"], title: "Auction Software"},
+  ],
   js: {
     listApp: 'src/app/index.js',
     archiveApp: 'src/app/archive.js',
@@ -95,23 +96,18 @@ gulp.task('css', () => {
     .pipe(gulp.dest(buildDir));
 });
 
+gulp.task('htmlPages', () => {
+  let streams = sources.html.map((page) => {
+    return gulp.src('./templates/base.html')
+    .pipe(fileinclude({
+      prefix: '@@',
+      indent: true,
+      context: {title: page.title, name: page.name, scripts: page.scripts}}))
+    .on('error', interceptErrors)
+    .pipe(rename(page.name +'.html'))
+    .pipe(gulp.dest(buildDir));
 
-gulp.task('listingPage', () => {
-    return gulp.src(sources.html.indexPage)
-      .on('error', interceptErrors)
-      .pipe(gulp.dest(buildDir));
-});
-
-gulp.task('archivePage', () => {
-    return gulp.src(sources.html.archivePage)
-      .on('error', interceptErrors)
-      .pipe(gulp.dest(buildDir));
-});
-
-gulp.task('auctionPage', () => {
-    return gulp.src(sources.html.auctionPage)
-      .on('error', interceptErrors)
-      .pipe(gulp.dest(buildDir));
+  });
 });
 
 
@@ -152,7 +148,7 @@ gulp.task('auctionApp', () => {
 });
 
 
-gulp.task('build', ['all-js', 'css', 'png-images', 'icons', 'listingPage', 'listingApp', 'archivePage', 'archiveApp', 'auctionApp', 'auctionPage', 'fonts'], () => {
+gulp.task('build', ['all-js', 'css', 'png-images', 'icons', 'htmlPages', 'listingApp', 'archiveApp', 'auctionApp', 'fonts'], () => {
 
   let css = gulp.src(`${buildDir}/bundle.css`)
       .pipe(gulp.dest(outDir + '/css/'));
