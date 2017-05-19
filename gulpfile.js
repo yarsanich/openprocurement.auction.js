@@ -1,7 +1,6 @@
 const gulp          = require('gulp'),
       notify        = require('gulp-notify'),
       concat        = require('gulp-concat'),
-      bower         = require('gulp-bower'),
       vendorFiles   = require('gulp-main-bower-files'),
       minify        = require('gulp-minify'),
       gulpFilter    = require('gulp-filter'),
@@ -47,10 +46,6 @@ const sources = {
 };
 
 
-gulp.task('bower', () => {
-  return bower();
-});
-
 
 gulp.task('fonts', () => {
   return gulp.src(sources.fonts)
@@ -77,9 +72,8 @@ gulp.task('bower-main', () => {
   return allJs = gulp.src('./bower.json')
       .pipe(vendorFiles({
         base: "src/lib",}))
-      .pipe(gulpFilter('**/*.js'))
+      .pipe(gulpFilter(['**/*.js']))
       .pipe(gulp.dest(buildDir + '/vendor/'));
-
 });
 
 
@@ -144,6 +138,8 @@ gulp.task('archiveApp', () => {
     .pipe(gulp.dest(buildDir));
 });
 
+
+
 gulp.task('auctionApp', () => {
   let b = browserify({entries: sources.js.auctionApp});
   return b
@@ -156,7 +152,7 @@ gulp.task('auctionApp', () => {
 });
 
 
-gulp.task('build', ['bower', 'all-js', 'css', 'png-images', 'icons', 'listingPage', 'listingApp', 'archivePage', 'archiveApp', 'auctionApp', 'auctionPage', 'fonts'], () => {
+gulp.task('build', ['all-js', 'css', 'png-images', 'icons', 'listingPage', 'listingApp', 'archivePage', 'archiveApp', 'auctionApp', 'auctionPage', 'fonts'], () => {
 
   let css = gulp.src(`${buildDir}/bundle.css`)
       .pipe(gulp.dest(outDir + '/css/'));
