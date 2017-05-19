@@ -12,6 +12,7 @@ const gulp          = require('gulp'),
       fileinclude   = require('gulp-file-include'),
       uglify        = require('gulp-uglify'),
       rename        = require("gulp-rename"),
+      fs            = require("fs"),
       merge         = require('merge-stream');
 
 function  interceptErrors(error) {
@@ -27,25 +28,7 @@ const buildDir = 'build/';
 const outDir = '_attachments/';
 
 
-const sources = {
-  styles: ['src/assets/css/starter-template.css', 'src/lib/angular-growl-2/build/angular-growl.min.css'],
-  fonts: 'src/assets/fonts/*',
-  html: [
-    {name: 'index', scripts: ["index.js"], title: "Auction Software"},
-    {name: 'archive', scripts: ["archive.js"], title: "Auction Software"},
-    {name: 'tender', scripts: ["auction.js"], title: "Auction Software"},
-  ],
-  js: {
-    listApp: 'src/app/index.js',
-    archiveApp: 'src/app/archive.js',
-    auctionApp: 'src/app/auction.js',
-  },
-  img: {
-    png: 'src/assets/img/*.png',
-    icons: 'src/assets/img/img/*.png'
-  }
-};
-
+const sources = JSON.parse(fs.readFileSync('./config.json'));
 
 
 gulp.task('fonts', () => {

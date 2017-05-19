@@ -1,0 +1,18 @@
+{
+  "styles": ["src/assets/css/starter-template.css", "src/lib/angular-growl-2/build/angular-growl.min.css"],
+  "fonts": "src/assets/fonts/*",
+  "html": [
+    {"name": "index",   "scripts": ["index.js"],   "title": "Auction Software"},
+    {"name": "archive", "scripts": ["archive.js"], "title": "Auction Software"},
+    {"name": "tender",  "scripts": ["auction.js"], "title": "Auction Software"}
+  ],
+  "js": {
+    "listApp": "src/app/index.js",
+    "archiveApp": "src/app/archive.js",
+    "auctionApp": "src/app/auction.js"
+  },
+  "img": {
+    "png": "src/assets/img/*.png",
+    "icons": "src/assets/img/img/*.png"
+  }
+}
