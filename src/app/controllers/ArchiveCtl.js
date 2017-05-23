@@ -1,4 +1,4 @@
-export default function ArchiveController($scope, $http, $location) {
+export default function ArchiveController(AuctionConfig, $scope, $http, $location) {
   /*@ngInject;*/
   let startid = false;
 
@@ -8,11 +8,9 @@ export default function ArchiveController($scope, $http, $location) {
   let offset = params.offset || (new Date()).getTime() * 1000;
   let startkey_docid = params.startid || '';
 
-  let url = location.protocol + '//' + location.host + '/auctions'; 
-  let newLocation = url + '/_design/auctions/_view/by_endDate';
   $http({
     method: 'GET',
-    url: newLocation,
+    url: AuctionConfig.db_url + '/_design/auctions/_view/by_endDate',
     cache: true,
     params: {
       include_docs: true,

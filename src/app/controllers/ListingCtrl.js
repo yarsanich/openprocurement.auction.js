@@ -1,12 +1,10 @@
-export default function ListingController($scope, $http) {
+export default function ListingController(AuctionConfig, $scope, $http) {
   /*@ngInject;*/
-
-  let url = location.protocol + '//' + location.host + '/auctions/';
-  let newLocation = url + '/_design/auctions/_view/by_endDate';
+  
   $scope.url = location.protocol + '//' + location.host + '/tenders';
   $http({
     method: 'GET',
-    url: newLocation,
+    url: AuctionConfig.db_url + '/_design/auctions/_view/by_endDate',
     cache: true,
     params: {
       include_docs: true,
@@ -15,8 +13,4 @@ export default function ListingController($scope, $http) {
   }).then(function(resp) {
     $scope.auctions = resp.data.rows;
   });
-
-  //$scope.locateToTender = function(_id) {
-  //  return location.protocol + '//' + location.host + location.pathname.replace('/list', '/tender'); 
-  //};
 }

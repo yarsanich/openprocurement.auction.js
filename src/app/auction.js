@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 import AuctionController from './controllers/AuctionCtl';
 import OffCanvasController from './controllers/OffCanvasCtl';
 import nghReplace from './directives/Replace';
