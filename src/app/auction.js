@@ -1,3 +1,5 @@
+
+import angular from '../lib/angular';
 import AuctionController from './controllers/AuctionCtl';
 import OffCanvasController from './controllers/OffCanvasCtl';
 import nghReplace from './directives/Replace';
@@ -25,7 +27,6 @@ let app = angular.module('auction', appRequires),
     db = {},
     bidder_id = "0",
     db_url = (location.protocol + '//' + location.host + '/auctions/' ) || "",
-    evtSrc = {},
     dataLayer = dataLayer || [];
 
 
@@ -35,7 +36,7 @@ app
     restart_retries: 10,
     default_lang: 'uk',
     debug: false })
-  .config(['$logProvider', 'AuctionConfig', 'growlProvider', 'GTMLoggerProvider', AuctionConfig])
+  .config(['$logProvider', "$httpProvider", 'AuctionConfig', 'growlProvider', 'GTMLoggerProvider', AuctionConfig])
   .config(['$translateProvider', translations])
   .filter('formatnumber', ['$filter', formatnumber])
   .filter('fraction', ['$filter', fraction])
