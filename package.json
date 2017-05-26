@@ -16,6 +16,7 @@
     "browserify-ngannotate": "^2.0.0",
     "chai": "~1.10.0",
     "config-browserify": "^1.0.5",
+    "del": "^2.2.2",
     "gulp": "^3.9.1",
     "gulp-bundle-assets": "^2.28.0",
     "gulp-concat": "^2.6.1",

@@ -1,5 +1,6 @@
 const gulp          = require('gulp'),
       notify        = require('gulp-notify'),
+      del           = require('del'),
       concat        = require('gulp-concat'),
       vendorFiles   = require('gulp-main-bower-files'),
       minify        = require('gulp-minify'),
@@ -63,7 +64,9 @@ gulp.task('all-js', ['bower-main'], () => {
   return gulp.src([
     config.buildDir + '/vendor/**/*.js',
     './src/lib/moment/locale/uk.js',
-    './src/lib/moment/locale/ru.js'])
+    './src/lib/moment/locale/ru.js',
+    './src/lib/puchdb/**/*.js',
+  ])
     .pipe(concat('vendor.js'))
     .pipe(gulp.dest(config.buildDir));
 });
@@ -88,7 +91,8 @@ gulp.task('htmlPages', () => {
         name: page.name,
         scripts: page.scripts,
 	controller: page.controller,
-        db_url: config.dbUrl
+        db_url: config.dbUrl,
+        auctions_server: config.auctions_server
       }}))
     .on('error', interceptErrors)
     .pipe(rename(page.name +'.html'))
@@ -179,3 +183,7 @@ gulp.task('build', ['all-js', 'css', 'png-images', 'icons', 'htmlPages', 'listin
 
 
 gulp.task('default', ['build']);
+
+gulp.task('clean', function () {
+  del.sync([config.buildDir + '*/**', config.outDir + '*/**'], {force: true});
+});
