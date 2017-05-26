@@ -1,4 +1,5 @@
-export default function AuctionConfig($logProvider, AuctionConfig, growlProvider, GTMLoggerProvider) {
+export default function AuctionConfig($logProvider, $httpProvider, AuctionConfig, growlProvider, GTMLoggerProvider) {
+  $httpProvider.defaults.withCredentials = true;
   GTMLoggerProvider.level('INFO').includeTimestamp( true );
   $logProvider.debugEnabled(AuctionConfig.debug); // default is true
   growlProvider.globalTimeToLive({
