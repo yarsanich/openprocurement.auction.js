@@ -106,7 +106,6 @@ gulp.task('listingApp', () => {
   let b = browserify({entries: config.js.listApp});
   return b
     .transform(babelify, {presets: ["es2015"], compact: false})
-    .transform(ngAnnotate)
     .bundle()
     .on('error', interceptErrors)
     .pipe(source('index.js'))
@@ -129,7 +128,7 @@ gulp.task('archiveApp', () => {
 gulp.task('auctionApp', () => {
   let b = browserify({entries: config.js.auctionApp});
   return b
-    .transform(babelify, {presets: ["es2015"]})
+    .transform(babelify, {presets: ["es2015"], compact: false})
     .transform(ngAnnotate)
     .bundle()
     .on('error', interceptErrors)
