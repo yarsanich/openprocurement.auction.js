@@ -3,30 +3,24 @@ export default function AuctionController(
   $timeout, $http, $log, $cookies, $cookieStore, $window,
   $rootScope, $location, $translate, $filter, growl, growlMessages, $aside, $q
 ) {
+
+  let sse_url = window.location.href.replace(window.location.search, '');
+  let evtSrc = '';
+
   if (AuctionUtils.inIframe()) {
     $log.error('Starts in iframe');
     window.open(location.href, '_blank');
     return false;
   }
+
   AuctionConfig.auction_doc_id = window.location.pathname.replace('/tenders/', '');
-  $scope.$watch(function() {
-    return $location.path().replace('/', '');
-  }, function(oldValue, newValue) {
-    $log.info({
-      message: "reload auction",
-      oldDoc: oldValue,
-      newAuction: newValue
-    });
-    if (oldValue !== newValue) {
-      $window.location.reload();
-    }
-  });
-  $log.info($location.path());
+
   $scope.lang = 'uk';
   $rootScope.normilized = false;
   $rootScope.format_date = AuctionUtils.format_date;
   $scope.bidder_id = null;
   $scope.bid = null;
+  $scope.follow_login_allowed = false;
   $scope.allow_bidding = true;
   $rootScope.form = {};
   $rootScope.alerts = [];
@@ -115,7 +109,7 @@ export default function AuctionController(
   $rootScope.$on('timer-tick', function(event) {
     if (($scope.auction_doc) && (event.targetScope.timerid == 1)) {
       if (((($rootScope.info_timer || {}).msg || "") === 'until your turn') && (event.targetScope.minutes == 1) && (event.targetScope.seconds == 50)) {
-        $http.post('./check_authorization').success(function(data) {
+        $http.post(sse_url + '/check_authorization').success(function(data) {
           $log.info({
             message: "Authorization checked"
           });
@@ -154,44 +148,34 @@ export default function AuctionController(
       message: 'disable connection for client' + client_id
     });
     $scope.growlMessages.deleteMessage(msg);
-    $http.post('./kickclient', {
-      'client_id': client_id
-    }).success(
-      function(data) {
-        $log.info({
-          message: 'disable connection for client ' + client_id
-        });
-      });
+
+    $http.post(sse_url + '/kickclient', {
+      'client_id': client_id,
+    }).success(function(data) {
+      $log.info({message: 'disable connection for client ' + client_id});
+    });
   });
   //
 
-
   $scope.start_subscribe = function(argument) {
-    $log.info({
-      message: 'Start event source'
-    });
-    response_timeout = $timeout(function() {
-      $http.post('./set_sse_timeout', {
+    $log.info({message: 'Start event source'});
+ 
+    let response_timeout = $timeout(function() {
+      $http.post(sse_url + '/set_sse_timeout', {
         timeout: '7'
       }).success(function(data) {
-        $log.info({
-          message: 'Handled set_sse_timeout on event source'
-        });
+        $log.info({message: 'Handled set_sse_timeout on event source'});
       });
-      $log.info({
-        message: 'Start set_sse_timeout on event source'
-      });
+
+      $log.info({message: 'Start set_sse_timeout on event source', timeout: response_timeout});
     }, 20000);
-    evtSrc = new EventSource(window.location.href.replace(window.location.search, '') + '/event_source', {
-      'withCredentials': true
-    });
+    
+    evtSrc = new EventSource(sse_url + '/event_source', {withCredentials: true});
     $scope.restart_retries_events = 3;
     evtSrc.addEventListener('ClientsList', function(e) {
       var data = angular.fromJson(e.data);
-      $log.info({
-        message: 'Get Clients List',
-        clients: data
-      });
+      $log.info({message: 'Get Clients List', clients: data});
+
       $scope.$apply(function() {
         var i;
         if (angular.isObject($scope.clients)) {
@@ -226,17 +210,15 @@ export default function AuctionController(
           progress_timer: $rootScope.progres_timer
         });
       }
+      
     }, false);
     evtSrc.addEventListener('Identification', function(e) {
       if (response_timeout) {
         $timeout.cancel(response_timeout);
       }
       var data = angular.fromJson(e.data);
-      $log.info({
-        message: "Get Identification",
-        bidder_id: data.bidder_id,
-        client_id: data.client_id
-      });
+      $log.info({message: "Get Identification", bidder_id: data.bidder_id, client_id: data.client_id});
+
       $scope.start_sync_event.resolve('start');
       $scope.$apply(function() {
         $scope.bidder_id = data.bidder_id;
@@ -244,9 +226,7 @@ export default function AuctionController(
         $scope.return_url = data.return_url;
         if ('coeficient' in data) {
           $scope.bidder_coeficient = math.fraction(data.coeficient);
-          $log.info({
-            message: "Get coeficient " + $scope.bidder_coeficient
-          });
+          $log.info({message: "Get coeficient " + $scope.bidder_coeficient});
         }
       });
     }, false);
@@ -274,7 +254,8 @@ export default function AuctionController(
     evtSrc.addEventListener('Close', function(e) {
       $timeout.cancel(response_timeout);
       $log.info({
-        message: "Handle close event source"
+        message: "Handle close event source",
+        error: e,
       });
       if (!$scope.follow_login_allowed) {
         growl.info($filter('translate')('You are an observer and cannot bid.'), {
@@ -340,7 +321,7 @@ export default function AuctionController(
         $log.info({
           message: "Allow view bid form"
         });
-        $scope.max_bid_amount()
+        $scope.max_bid_amount();
         $scope.view_bids_form = true;
         return $scope.view_bids_form;
       }
@@ -352,7 +333,7 @@ export default function AuctionController(
   $scope.sync_times_with_server = function(start) {
     $http.get('/get_current_server_time', {
       'params': {
-        //'_nonce': Math.random().toString()
+        '_nonce': Math.random().toString()
       }
     }).success(function(data, status, headers, config) {
       $scope.last_sync = new Date(new Date(headers().date));
@@ -367,10 +348,10 @@ export default function AuctionController(
         progress_timer: $rootScope.progres_timer
       });
       var params = AuctionUtils.parseQueryString(location.search);
-      if ($scope.auction_doc.current_stage == -1){
+      if ($scope.auction_doc.current_stage == -1) {
         if ($rootScope.progres_timer.countdown_seconds < 900) {
           $scope.start_changes_feed = true;
-        }else{
+        } else {
           $timeout(function() {
             $scope.follow_login = true;
             $scope.start_changes_feed = true;
@@ -389,7 +370,7 @@ export default function AuctionController(
         }
         $scope.login_params = params;
         delete $scope.login_params.wait;
-        $scope.login_url = './login?' + AuctionUtils.stringifyQueryString($scope.login_params);
+        $scope.login_url =  sse_url + '/login?' + AuctionUtils.stringifyQueryString($scope.login_params);
       } else {
         $scope.follow_login_allowed = false;
       }
@@ -407,7 +388,7 @@ export default function AuctionController(
     });
     
     if (parseFloat($rootScope.form.bid) == -1) {
-      msg_id = Math.random();
+      let msg_id = Math.random();
       $rootScope.alerts.push({
         msg_id: msg_id,
         type: 'danger',
@@ -420,7 +401,7 @@ export default function AuctionController(
       $rootScope.alerts = [];
       var bid_amount = parseFloat(bid) || parseFloat($rootScope.form.bid) || 0;
       if (bid_amount == $scope.minimal_bid.amount) {
-        msg_id = Math.random();
+        let msg_id = Math.random();
         $rootScope.alerts.push({
           msg_id: msg_id,
           type: 'warning',
@@ -434,7 +415,8 @@ export default function AuctionController(
       if (!$scope.post_bid_timeout) {
         $scope.post_bid_timeout = $timeout($scope.warning_post_bid, 10000);
       }
-      $http.post('./postbid', {
+
+      $http.post(sse_url + '/postbid', {
         'bid': parseFloat(bid) || parseFloat($rootScope.form.bid) || 0,
         'bidder_id': $scope.bidder_id || bidder_id || "0"
       }).success(function(data) {
@@ -463,14 +445,14 @@ export default function AuctionController(
         } else {
           var bid = data.data.bid;
           if ((bid <= ($scope.max_bid_amount() * 0.1)) && (bid != -1)) {
-            msg_id = Math.random();
+            let msg_id = Math.random();
             $rootScope.alerts.push({
               msg_id: msg_id,
               type: 'warning',
               msg: 'Your bid appears too low'
             });
           }
-          msg_id = Math.random();
+          let msg_id = Math.random();
           if (bid == -1) {
             $rootScope.alerts = [];
             $scope.allow_bidding = true;
@@ -605,7 +587,7 @@ export default function AuctionController(
         message: "Changes error",
         error_data: err
       });
-      $scope.end_changes = new Date()
+      $scope.end_changes = new Date();
       if ((($scope.end_changes - $scope.start_changes) > 40000)||($scope.force_heartbeat)) {
         $scope.force_heartbeat = true;
       } else {
@@ -652,7 +634,7 @@ export default function AuctionController(
           });
           $scope.http_error_timeout = $scope.http_error_timeout * 2;
           $timeout(function() {
-            $scope.start_auction_process()
+            $scope.start_auction_process();
           }, $scope.http_error_timeout);
         }
         return;
@@ -661,12 +643,10 @@ export default function AuctionController(
       var params = AuctionUtils.parseQueryString(location.search);
 
       $scope.start_sync_event = $q.defer();
-      //
       if (doc.current_stage >= -1 && params.wait) {
+	$log.info("login allowed " + doc.current_stage);
         $scope.follow_login_allowed = true;
-        $log.info({
-          message: 'client wait for login'
-        });
+        $log.info({message: 'client wait for login'});
       } else {
         $scope.follow_login_allowed = false;
       }
@@ -699,30 +679,31 @@ export default function AuctionController(
                 $log.info({
                   message: 'Start changes feed'
                 });
-                $scope.sync = $scope.start_sync()
+                $scope.sync = $scope.start_sync();
               }
-            })
+            });
           } else {
             $scope.start_sync_event.resolve('start');
           }
+	  $log.info("LOGIN ALLOWED " + $scope.follow_login_allowed);
           if (!$scope.follow_login_allowed) {
             $timeout(function() {
               growl.info($filter('translate')('You are an observer and cannot bid.'), {
                 ttl: -1,
                 disableCountDown: true
               });
-            }, 500)
+            }, 500);
           }
         }
         $scope.restart_retries = AuctionConfig.restart_retries;
         $scope.start_sync_event.promise.then(function() {
-          $scope.sync = $scope.start_sync()
+          $scope.sync = $scope.start_sync();
         });
       } else {
         // TODO: CLEAR COOKIE
         $log.info({
           message: 'Auction ends already'
-        })
+        });
       }
     });
   };
