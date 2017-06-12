@@ -10,13 +10,16 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['jasmine', 'requirejs'],
+    frameworks: ['jasmine'],
 
 
     // list of files / patterns to load in the browser
     files: [
       './src/lib/angular/angular.js',
+      './src/lib/event-source-polyfill/eventsource.js',
+      './src/lib/pouchdb/dist/pouchdb.min.js',
       './src/lib/angular-mocks/angular-mocks.js',
+      //'./src/lib/pouchdb/dist/pouchdb.localstorage.js',
       './src/lib/angular-cookies/angular-cookies.js',
       './src/lib/angular-translate/*.js',
       './src/lib/angular-translate-storage-cookie/*.js',
@@ -26,7 +29,7 @@ module.exports = function(config) {
       './src/lib/angular-growl-2/build/*.js',
       './src/lib/angular-ellipses/src/*.js',
       './src/lib/angular-gtm-logger/*.js',
-      //'./src/lib/mathjs/dist/*.js',
+      './src/lib/mathjs/dist/*.js',
       //'./src/lib/moment/*.js',
       //'./src/lib/moment-timezone/*.js',
       './src/app/auction.js',
@@ -36,8 +39,12 @@ module.exports = function(config) {
       './src/app/controllers/*.js',
       './src/app/filters/*.js',
       './src/app/directives/*.js',
-      'test-main.js',
-      './src/app/tests/*.spec.js',
+      //'test-main.js',
+      './src/app/tests/auction_data_samples.js',
+      './src/app/tests/auction_utils.spec.js',
+      './src/app/tests/controllers.spec.js',
+      './src/app/tests/filters.spec.js',
+      './src/app/tests/utils.spec.js',
     ],
 
 
