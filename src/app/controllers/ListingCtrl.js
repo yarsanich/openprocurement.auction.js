@@ -1,4 +1,6 @@
-export default function ListingController(AuctionConfig, $scope, $http) {
+angular.module('auction').controller('ListingController',[
+  'AuctionConfig', '$scope', '$http',
+  function (AuctionConfig, $scope, $http) {
   /*@ngInject;*/
   
   $scope.url = location.protocol + '//' + location.host + '/tenders';
@@ -13,4 +15,4 @@ export default function ListingController(AuctionConfig, $scope, $http) {
   }).then(function(resp) {
     $scope.auctions = resp.data.rows;
   });
-}
+}]);

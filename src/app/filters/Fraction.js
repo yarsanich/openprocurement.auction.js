@@ -1,4 +1,4 @@
-function fraction(filter) {
+angular.module('auction').filter('fraction', [function () {
   return function(val, coeficient) {
     var format_function = function(val) {
       return math.format(Number(val), {
@@ -17,13 +17,11 @@ function fraction(filter) {
     }
     return "";
   };
-}
+}]);
 
 
-function fraction_string(filter) {
+angular.module('auction').filter('fraction_string', [function () {
   return function(val) {
     return math.fraction(val).toString();
   };
-}
-
-export {fraction, fraction_string};
+}]);

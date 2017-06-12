@@ -1,4 +1,6 @@
-export default function AuctionUtils($filter, $timeout, $log, $window) {
+angular.module('auction').factory('AuctionUtils', [
+    '$filter', '$timeout', '$log', '$window',
+    function ($filter, $timeout, $log, $window) {
     // Format msg for timer
     'use strict';
 
@@ -371,4 +373,4 @@ export default function AuctionUtils($filter, $timeout, $log, $window) {
       'detectIE': detectIE,
       'UnsupportedBrowser': UnsupportedBrowser
     };
-}
+}]);

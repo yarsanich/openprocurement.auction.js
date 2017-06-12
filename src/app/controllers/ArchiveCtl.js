@@ -1,12 +1,14 @@
-export default function ArchiveController(AuctionConfig, $scope, $http, $location) {
+angular.module('auction').controller('ArchiveController', [
+  'AuctionConfig', '$scope', '$http', '$location',
+  function(AuctionConfig, $scope, $http, $location) {
   /*@ngInject;*/
-  let startid = false;
+  var startid = false;
 
-  let params = $location.search();
+  var params = $location.search();
   console.log(params);
 
-  let offset = params.offset || (new Date()).getTime() * 1000;
-  let startkey_docid = params.startid || '';
+  var offset = params.offset || (new Date()).getTime() * 1000;
+  var startkey_docid = params.startid || '';
 
   $http({
     method: 'GET',
@@ -31,4 +33,4 @@ export default function ArchiveController(AuctionConfig, $scope, $http, $locatio
   }
   $scope.offset = offset;
   $scope.startid = startid;
-}
+}])

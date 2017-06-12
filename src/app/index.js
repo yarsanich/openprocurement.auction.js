@@ -1,15 +1,9 @@
-import angular from '../lib/angular';
-import ListingController from './controllers/ListingCtrl';
-
-
 const requires = [
+    'angular-growl',
+    'GTMLogger'
 ];
 
 
-let app = angular.module('auction', requires);
-
-app
-  .constant('AuctionConfig', {
-    db_url:  window.db_url
-  })
-  .controller('ListingController', ['AuctionConfig', '$scope', '$http', ListingController]);
+angular.module('auction', requires).constant(
+    'AuctionConfig', { db_url:  window.db_url
+})

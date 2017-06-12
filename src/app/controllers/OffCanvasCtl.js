@@ -1,4 +1,6 @@
-export default function OffCanvasController($scope, $modalInstance) {
+angular.module('auction').controller('OffCanvasController', [
+    '$scope', '$modalInstance',
+    function ($scope, $modalInstance) {
   $scope.allert = function() {
     console.log($scope);
   };
@@ -8,4 +10,4 @@ export default function OffCanvasController($scope, $modalInstance) {
   $scope.cancel = function() {
     $modalInstance.dismiss('cancel');
   };
-}
+}]);

@@ -1,4 +1,4 @@
-export default function format($filter) {
+angular.module('auction').directive('format', ['$filter', function ($filter) {
   return {
     require: '?ngModel',
     link: function(scope, elem, attrs, ctrl) {
@@ -41,5 +41,4 @@ export default function format($filter) {
       });
     }
   };
-}
-
+}]);

@@ -1,6 +1,7 @@
-export default function translations($translateProvider) {
-  $translateProvider.useLocalStorage();
-  $translateProvider.translations('en', {
+angular.module('auction').config(
+    function($translateProvider) {
+    $translateProvider.useLocalStorage();
+    $translateProvider.translations('en', {
     'at': 'at',
     'Announcement': 'Announcement',
     'Bid': 'Bid',
@@ -255,4 +256,4 @@ export default function translations($translateProvider) {
     'Waiting for the disclosure of the participants\' names': 'Ожидаем раскрытия имен участников',
     'Unable to place a bid. Check that no more than 2 auctions are simultaneously opened in your browser.': 'Невозможно сделать ставку. Проверьте, что в браузере открыто не более 2-х аукционов.'
   });
-}
+});

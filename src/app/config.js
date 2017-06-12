@@ -1,4 +1,6 @@
-export default function AuctionConfig($logProvider, $httpProvider, AuctionConfig, growlProvider, GTMLoggerProvider) {
+angular.module('auction').config([
+  '$logProvider', '$httpProvider', 'AuctionConfig', 'growlProvider', 'GTMLoggerProvider',
+  function ($logProvider, $httpProvider, AuctionConfig, growlProvider, GTMLoggerProvider) {
   $httpProvider.defaults.withCredentials = true;
   GTMLoggerProvider.level('INFO').includeTimestamp( true );
   $logProvider.debugEnabled(AuctionConfig.debug); // default is true
@@ -10,4 +12,4 @@ export default function AuctionConfig($logProvider, $httpProvider, AuctionConfig
   });
   growlProvider.globalPosition('top-center');
   growlProvider.onlyUniqueMessages(false);
-}
+}]);

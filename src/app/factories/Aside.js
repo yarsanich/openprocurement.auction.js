@@ -1,5 +1,4 @@
-export default function aside($modal) {
-
+angular.module('auction').factory('$aside', ['$modal', function ($modal) {
   var asideFactory = {
     open: function(config) {
       var options = angular.extend({}, config);
@@ -11,4 +10,4 @@ export default function aside($modal) {
     }
   };
   return angular.extend({}, $modal, asideFactory);
-}
+}]);

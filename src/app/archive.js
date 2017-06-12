@@ -1,15 +1,8 @@
-import angular from '../lib/angular';
-import ArchiveController from './controllers/ArchiveCtl';
-
-
 const requires = [
+    'angular-growl',
+    'GTMLogger'
 ];
 
-
-let app = angular.module('auction', requires);
-
-app
-  .constant('AuctionConfig', {
-    db_url:  window.db_url
-  })
-  .controller('ArchiveController',  ['AuctionConfig', '$scope', '$http', '$location', ArchiveController]);
+angular.module('auction', requires).constant(
+    'AuctionConfig', { db_url: window.db_url 
+})

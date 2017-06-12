@@ -1,4 +1,6 @@
-export default function nghReplace($compile, $parse, $rootScope) {
+angular.module('auction').directive('nghReplace', [
+    '$compile', '$parse', '$rootScope',
+    function ($compile, $parse, $rootScope) {
   return {
     replace: true,
     link: function(scope, element, attr) {
@@ -8,5 +10,4 @@ export default function nghReplace($compile, $parse, $rootScope) {
       }, true);
     }
   };
-}
-
+}]);
