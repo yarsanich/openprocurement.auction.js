@@ -14,7 +14,8 @@ const gulp          = require('gulp'),
       uglify        = require('gulp-uglify'),
       rename        = require("gulp-rename"),
       fs            = require("fs"),
-      merge         = require('merge-stream');
+      merge         = require('merge-stream'),
+      server        = require('karma').Server;
 
 function  interceptErrors(error) {
   let args = Array.prototype.slice.call(arguments);
@@ -103,36 +104,34 @@ gulp.task('htmlPages', () => {
 
 
 gulp.task('listingApp', () => {
-  let b = browserify({entries: config.js.listApp});
-  return b
-    .transform(babelify, {presets: ["es2015"], compact: false})
-    .bundle()
-    .on('error', interceptErrors)
-    .pipe(source('index.js'))
+  return gulp.src(['./src/app/index.js',
+    './src/app/config.js',
+    './src/app/controllers/ListingCtrl.js'
+    ])
+    .pipe(concat('index.js'))
     .pipe(gulp.dest(config.buildDir));
 });
 
 gulp.task('archiveApp', () => {
-  let b = browserify({entries: config.js.archiveApp});
-  return b
-    .transform(babelify, {presets: ["es2015"], compact: false})
-    .transform(ngAnnotate)
-    .bundle()
-    .on('error', interceptErrors)
-    .pipe(source('archive.js'))
+  return gulp.src(['./src/app/archive.js',
+    './src/app/config.js',
+    './src/app/controllers/ArchiveCtl.js'])
+    .pipe(concat('archive.js'))
     .pipe(gulp.dest(config.buildDir));
 });
 
 
 
 gulp.task('auctionApp', () => {
-  let b = browserify({entries: config.js.auctionApp});
-  return b
-    .transform(babelify, {presets: ["es2015"], compact: false})
-    .transform(ngAnnotate)
-    .bundle()
-    .on('error', interceptErrors)
-    .pipe(source('auction.js'))
+    return gulp.src(['./src/app/auction.js',
+      './src/app/filters/*.js',
+      './src/app/translations.js',
+      './src/app/config.js',
+      './src/app/factories/*.js',
+      './src/app/controllers/AuctionCtl.js',
+      './src/app/controllers/OffCanvasCtl.js',
+      './src/app/directives/*.js'])
+    .pipe(concat('auction.js'))
     .pipe(gulp.dest(config.buildDir));
 });
 
@@ -177,7 +176,7 @@ gulp.task('build', ['all-js', 'css', 'png-images', 'icons', 'htmlPages', 'listin
       .pipe(gulp.dest(config.outDir+'/fonts/'));
 
 
-  return merge(css, png, fonts, listPage, listApp, vendor_js, auctionPage, auctionApp, fonts, fonts2, icons);
+  return merge(css, png, fonts, vendor_js, listPage, listApp, auctionPage, auctionApp, archivePage, archiveApp, fonts, fonts2, icons);
 });
 
 
@@ -185,4 +184,11 @@ gulp.task('default', ['build']);
 
 gulp.task('clean', function () {
   del.sync([config.buildDir + '*/**', config.outDir + '*/**'], {force: true});
+});
+
+gulp.task('test', function(done) {
+  new server({
+    configFile:__dirname + '/karma.conf.js',
+    singleRun: true
+  }, done).start();
 });
