@@ -4,5 +4,5 @@ const requires = [
 ];
 
 angular.module('auction', requires).constant(
-    'AuctionConfig', { db_url: window.db_url 
+    'AuctionConfig', { db_url: (location.protocol + '//' + location.host + '/auctions/' ) || "" 
 })
