@@ -383,13 +383,14 @@ angular.module('auction').controller('AuctionController',[
     $scope.warning_post_bid = function(){
       growl.error('Unable to place a bid. Check that no more than 2 auctions are simultaneously opened in your browser.');
     };
-    $scope.post_bid = function(bid) {
+    $scope.post_bid = function(yearlyPayments, contractDuration) {
       $log.info({
         message: "Start post bid",
-        bid_data: parseFloat(bid) || parseFloat($rootScope.form.bid) || 0
+        yearlyPayments_data: parseFloat(yearlyPayments) || parseFloat($rootScope.form.bid_yearlyPayments) || 0,
+        contractDuration_data: parseFloat(contractDuration) || parseFloat($rootScope.form.bid_contractDuration) || 0
       });
       
-      if (parseFloat($rootScope.form.bid) == -1) {
+      if (parseFloat($rootScope.form.bid_yearlyPayments) + parseFloat($rootScope.form.bid_contractDuration) <= -1) {
         var msg_id = Math.random();
         $rootScope.alerts.push({
           msg_id: msg_id,
@@ -401,7 +402,9 @@ angular.module('auction').controller('AuctionController',[
       }
       if ($rootScope.form.BidsForm.$valid) {
         $rootScope.alerts = [];
-        var bid_amount = parseFloat(bid) || parseFloat($rootScope.form.bid) || 0;
+        var bid_yearlyPayments = parseFloat(yearlyPayments) || parseFloat($rootScope.form.bid_yearlyPayments) || 0;
+        var bid_contractDuration = parseFloat(contractDuration) || parseFloat($rootScope.form.bid_contractDuration) || 0;
+        var bid_amount = bid_yearlyPayments + bid_contractDuration; // TODO New calculation 
         if (bid_amount == $scope.minimal_bid.amount) {
           var msg_id = Math.random();
           $rootScope.alerts.push({
@@ -419,7 +422,8 @@ angular.module('auction').controller('AuctionController',[
         }
 
         $http.post(sse_url + '/postbid', {
-          'bid': parseFloat(bid) || parseFloat($rootScope.form.bid) || 0,
+          'bid_yearly_payments': parseFloat(yearlyPayments) || parseFloat($rootScope.form.bid_yearlyPayments) || 0,
+          'bid_contract_duration': parseFloat(contractDuration) || parseFloat($rootScope.form.bid_contractDuration) || 0,
           'bidder_id': $scope.bidder_id || bidder_id || "0"
         }).success(function(data) {
           if ($scope.post_bid_timeout){
@@ -445,7 +449,7 @@ angular.module('auction').controller('AuctionController',[
               }
             }
           } else {
-            var bid = data.data.bid;
+            var bid = data.data.bid_yearlyPayments + data.data.bid_contractDuration; // TODO New calculation
             if ((bid <= ($scope.max_bid_amount() * 0.1)) && (bid != -1)) {
               var msg_id = Math.random();
               $rootScope.alerts.push({
@@ -469,14 +473,15 @@ angular.module('auction').controller('AuctionController',[
               $log.info({
                 message: "Handle cancel bid response on post bid"
               });
-              $rootScope.form.bid = "";
-              $rootScope.form.full_price = '';
-              $rootScope.form.bid_temp = '';
+              $rootScope.form.bid_yearlyPayments = "";
+              $rootScope.form.bid_contractDuration = "";
+              $rootScope.form.bid_yearlyPayments_temp = "";
+              $rootScope.form.bid_contractDuration_temp = "";
 
             } else {
               $log.info({
                 message: "Handle success response on post bid",
-                bid_data: data.data.bid
+                bid_data: data.data.bid_yearlyPayments + data.data.bid_yearly_payments
               });
               $rootScope.alerts.push({
                 msg_id: msg_id,
@@ -507,7 +512,7 @@ angular.module('auction').controller('AuctionController',[
                 message: "Ability to submit bids has been lost. Wait until page reloads, and retry."
               });
               relogin = function() {
-                window.location.replace(window.location.href + '/relogin?amount=' + $rootScope.form.bid);
+                window.location.replace(window.location.href + '/relogin?amount=' + $rootScope.form.bid_yearlyPayments + $rootScope.form.bid_contractDuration);
               }
               $timeout(relogin, 3000);
             } else {
@@ -529,9 +534,9 @@ angular.module('auction').controller('AuctionController',[
         var current_stage_obj = $scope.auction_doc.stages[$scope.auction_doc.current_stage] || null;
         if ((angular.isObject(current_stage_obj)) && (current_stage_obj.amount || current_stage_obj.amount_features)) {
           if ($scope.bidder_coeficient && ($scope.auction_doc.auction_type || "default" == "meat")) {
-            amount = math.fraction(current_stage_obj.amount_features) * $scope.bidder_coeficient - math.fraction($scope.auction_doc.minimalStep.amount);
+            amount = math.fraction(current_stage_obj.amount_features) / $scope.bidder_coeficient + math.fraction($scope.auction_doc.minimalStep.amount);
           } else {
-            amount = math.fraction(current_stage_obj.amount) - math.fraction($scope.auction_doc.minimalStep.amount);
+            amount = math.fraction(current_stage_obj.amount) + math.fraction($scope.auction_doc.minimalStep.amount);
           }
         }
       };
@@ -571,7 +576,7 @@ angular.module('auction').controller('AuctionController',[
             return Date.parse(a.time || "") - Date.parse(b.time || "");
           }
           return diff;
-        })[0];
+        })[bids.length - 1];
       }
     };
     $scope.start_sync = function() {
@@ -767,14 +772,15 @@ angular.module('auction').controller('AuctionController',[
       });
     };
     /* 2-WAY INPUT */
+    // TODO New calculation type
     $scope.calculate_bid_temp = function() {
-      $rootScope.form.bid_temp = Number(math.fraction(($rootScope.form.bid * 100).toFixed(), 100));
-      $rootScope.form.full_price = $rootScope.form.bid_temp / $scope.bidder_coeficient;
+      $rootScope.form.bid_temp = Number(math.fraction((($rootScope.form.bid_yearlyPayments + $rootScope.form.bid_contractDuration) * 100).toFixed(), 100));
+      $rootScope.form.full_price = $rootScope.form.bid_temp * $scope.bidder_coeficient;
       $log.debug("Set bid_temp:", $rootScope.form);
     };
     $scope.calculate_full_price_temp = function() {
-      $rootScope.form.bid = (math.fix((math.fraction($rootScope.form.full_price) * $scope.bidder_coeficient) * 100)) / 100;
-      $rootScope.form.full_price_temp = $rootScope.form.bid / $scope.bidder_coeficient;
+      $rootScope.form.bid = math.fix((math.fraction((($rootScope.form.bid_yearlyPayments + $rootScope.form.bid_contractDuration) * $scope.bidder_coeficient) * 100)) / 100);
+      $rootScope.form.full_price_temp = ($rootScope.form.bid_contractDuration + $rootScope.form.bid_contractDuration) * $scope.bidder_coeficient;
     };
     $scope.set_bid_from_temp = function() {
       $rootScope.form.bid = $rootScope.form.bid_temp;
