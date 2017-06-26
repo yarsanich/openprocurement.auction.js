@@ -389,7 +389,6 @@ angular.module('auction').controller('AuctionController',[
         yearlyPayments_data: parseFloat(yearlyPayments) || parseFloat($rootScope.form.bid_yearlyPayments) || 0,
         contractDuration_data: parseFloat(contractDuration) || parseFloat($rootScope.form.bid_contractDuration) || 0
       });
-      
       if (parseFloat($rootScope.form.bid_yearlyPayments) + parseFloat($rootScope.form.bid_contractDuration) <= -1) {
         var msg_id = Math.random();
         $rootScope.alerts.push({
@@ -404,7 +403,7 @@ angular.module('auction').controller('AuctionController',[
         $rootScope.alerts = [];
         var bid_yearlyPayments = parseFloat(yearlyPayments) || parseFloat($rootScope.form.bid_yearlyPayments) || 0;
         var bid_contractDuration = parseFloat(contractDuration) || parseFloat($rootScope.form.bid_contractDuration) || 0;
-        var bid_amount = bid_yearlyPayments + bid_contractDuration; // TODO New calculation 
+        var bid_amount = parseFloat(bid_yearlyPayments) + parseFloat(bid_contractDuration); // TODO New calculation 
         if (bid_amount == $scope.minimal_bid.amount) {
           var msg_id = Math.random();
           $rootScope.alerts.push({
@@ -426,6 +425,7 @@ angular.module('auction').controller('AuctionController',[
           'bid_contract_duration': parseFloat(contractDuration) || parseFloat($rootScope.form.bid_contractDuration) || 0,
           'bidder_id': $scope.bidder_id || bidder_id || "0"
         }).success(function(data) {
+          console.log(data)
           if ($scope.post_bid_timeout){
             $timeout.cancel($scope.post_bid_timeout);
             delete $scope.post_bid_timeout;
