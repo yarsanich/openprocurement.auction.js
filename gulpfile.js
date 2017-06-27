@@ -59,7 +59,7 @@ gulp.task('bower-main', () => {
 
 gulp.task('all-js', ['bower-main'], () => {
   return gulp.src([
-    config.buildDir + '/vendor/angular/angular.min.js',
+    config.buildDir + '/vendor/angular/angular.js',
     config.buildDir + '/vendor/**/**/*.js',
     './src/lib/moment/locale/uk.js',
     './src/lib/moment/locale/ru.js',
