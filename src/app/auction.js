@@ -1,4 +1,4 @@
-const appRequires = [
+var appRequires = [
   'ui.bootstrap',
   'ngCookies',
   'pascalprecht.translate',
