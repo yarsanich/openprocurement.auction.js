@@ -4,14 +4,14 @@
              "src/assets/css/starter-template.css"],
   "fonts": "src/assets/fonts/*",
   "html": [
-    {"name": "index",   "scripts": ["/vendor.js", "/index.js"],   "title": "Auction Software", "controller": "ListingController"},
-    {"name": "archive", "scripts": ["/vendor.js", "/archive.js"], "title": "Auction Software", "controller": "ArchiveController"},
-    {"name": "tender",  "scripts": ["/vendor.js", "/auction.js"], "title": "Auction Software", "controller": "AuctionController"}
+    {"name": "index",   "scripts": ["/vendor.js", "/index_app.js"],   "title": "Auction Software", "controller": "ListingController"},
+    {"name": "archive", "scripts": ["/vendor.js", "/archive_app.js"], "title": "Auction Software", "controller": "ArchiveController"},
+    {"name": "tender",  "scripts": ["/vendor.js", "/auction_app.js"], "title": "Auction Software", "controller": "AuctionController"}
   ],
   "js": {
-    "listApp": "src/app/index.js",
-    "archiveApp": "src/app/archive.js",
-    "auctionApp": "src/app/auction.js"
+    "listApp": "src/app/index_app.js",
+    "archiveApp": "src/app/archive_app.js",
+    "auctionApp": "src/app/auction_app.js"
   },
   "img": {
     "png": "src/assets/img/*.png",
