@@ -170,7 +170,7 @@ angular.module('auction').controller('AuctionController',[
         $log.error("Error on setting sse_timeout " + error);
       });
       $log.info({message: 'Start set_sse_timeout on event source', timeout: response_timeout});
-      }, 2000);
+      }, 20000);
       
       evtSrc = new EventSource(sse_url + '/event_source', {withCredentials: true});
       $scope.restart_retries_events = 3;
