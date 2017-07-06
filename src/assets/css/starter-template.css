@@ -113,7 +113,7 @@ body {
     width: 100%;
 }
 .stage-icon {
-    background-image: url(./future_stage.png);
+    background-image: url(../img/future_stage.png);
     background-repeat: no-repeat;
     background-position: 50% 50%;
     background-size: 36px 36px;
