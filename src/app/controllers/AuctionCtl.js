@@ -183,7 +183,7 @@ angular.module('auction').controller('AuctionController',[
           if (angular.isObject($scope.clients)) {
             for (i in data) {
               if (!(i in $scope.clients)) {
-                growl.warning($filter('translate')('In the room came a new user') + ' (IP:' + data[i].ip + ')' + '<button type="button" ng-click="$emit(\'kick_client\', + \'' + i + '\', message )" class="btn btn-link">' + $filter('translate')('prohibit connection') + '</button>', {
+                growl.warning($filter('translate')('In the room came a new user') + ' (IP:' + data[i].ip + ')' + '<button type="button" ng-click="$emit(\'kick_client\', \'' + i + '\', message )" class="btn btn-link">' + $filter('translate')('prohibit connection') + '</button>', {
                   ttl: 30000,
                   disableCountDown: true
                 });
