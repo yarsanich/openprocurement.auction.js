@@ -263,7 +263,7 @@ angular.module('auction').controller('AuctionController',[
           growl.info($filter('translate')('You are an observer and cannot bid.'), {
             ttl: -1,
             disableCountDown: true
-          });
+          }, 500);
           var params = AuctionUtils.parseQueryString(location.search);
           if (params.loggedin) {
             $timeout(function() {
