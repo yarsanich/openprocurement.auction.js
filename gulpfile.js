@@ -106,7 +106,7 @@ gulp.task('listingApp', () => {
     './src/app/config.js',
     './src/app/controllers/ListingCtrl.js'
     ])
-    .pipe(concat('index_app.js'))
+    .pipe(concat('index_app_simple.js'))
     .pipe(gulp.dest(config.buildDir));
 });
 
@@ -115,7 +115,7 @@ gulp.task('archiveApp', () => {
   return gulp.src(['./src/app/archive.js',
     './src/app/config.js',
     './src/app/controllers/ArchiveCtl.js'])
-    .pipe(concat('archive_app.js'))
+    .pipe(concat('archive_app_simple.js'))
     .pipe(gulp.dest(config.buildDir));
 });
 
@@ -129,7 +129,7 @@ gulp.task('auctionApp', () => {
       './src/app/controllers/AuctionCtl.js',
       './src/app/controllers/OffCanvasCtl.js',
       './src/app/directives/*.js'])
-    .pipe(concat('auction_app.js'))
+    .pipe(concat('auction_app_simple.js'))
     .pipe(gulp.dest(config.buildDir));
 });
 
@@ -142,7 +142,7 @@ gulp.task('build', ['all-js', 'css', 'png-images', 'icons', 'htmlPages', 'listin
   let listPage = gulp.src(`${config.buildDir}/index.html`)
       .pipe(gulp.dest(config.outDir));
 
-  let listApp = gulp.src(`${config.buildDir}/index_app.js`)
+  let listApp = gulp.src(`${config.buildDir}/index_app_simple.js`)
       .pipe(gulp.dest(config.outDir + '/static/'));
 
   let vendor_js = gulp.src(`${config.buildDir}/vendor.js`)
@@ -151,13 +151,13 @@ gulp.task('build', ['all-js', 'css', 'png-images', 'icons', 'htmlPages', 'listin
   let archivePage = gulp.src(`${config.buildDir}/archive.html`)
       .pipe(gulp.dest(config.outDir));
 
-  let archiveApp = gulp.src(`${config.buildDir}/archive_app.js`)
+  let archiveApp = gulp.src(`${config.buildDir}/archive_app_simple.js`)
       .pipe(gulp.dest(config.outDir + '/static/'));
 
   let auctionPage = gulp.src(`${config.buildDir}/tender.html`)
       .pipe(gulp.dest(config.outDir));
 
-  let auctionApp = gulp.src(`${config.buildDir}/auction_app.js`)
+  let auctionApp = gulp.src(`${config.buildDir}/auction_app_simple.js`)
       .pipe(gulp.dest(config.outDir + '/static/'));
 
   let png = gulp.src("build/*.png")
