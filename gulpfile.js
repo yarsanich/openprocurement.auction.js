@@ -161,11 +161,10 @@ gulp.task('build', ['all-js', 'css', 'png-images', 'icons', 'htmlPages', 'listin
       .pipe(gulp.dest(config.outDir + '/static/'));
 
   let png = gulp.src("build/*.png")
-      .pipe(gulp.dest(config.outDir));
+      .pipe(gulp.dest(config.outDir + '/static/img/'));
 
   let icons = gulp.src("build/img/*.png")
-      .pipe(gulp.dest(config.outDir+'/img/'));
-
+      .pipe(gulp.dest(config.outDir+ '/static/img/'));
 
   let fonts = gulp.src("build/fonts/*")
       .pipe(gulp.dest(config.outDir+'/static/fonts/'));
