@@ -529,9 +529,9 @@ angular.module('auction').controller('AuctionController',[
         var current_stage_obj = $scope.auction_doc.stages[$scope.auction_doc.current_stage] || null;
         if ((angular.isObject(current_stage_obj)) && (current_stage_obj.amount || current_stage_obj.amount_features)) {
           if ($scope.bidder_coeficient && ($scope.auction_doc.auction_type || "default" == "meat")) {
-            amount = math.fraction(current_stage_obj.amount_features) * $scope.bidder_coeficient - math.fraction($scope.auction_doc.minimalStep.amount);
+            amount = math.fraction(current_stage_obj.amount_features) / $scope.bidder_coeficient + math.fraction($scope.auction_doc.minimalStep.amount);
           } else {
-            amount = math.fraction(current_stage_obj.amount) - math.fraction($scope.auction_doc.minimalStep.amount);
+            amount = math.fraction(current_stage_obj.amount) + math.fraction($scope.auction_doc.minimalStep.amount);
           }
         }
       };
@@ -568,10 +568,10 @@ angular.module('auction').controller('AuctionController',[
             var diff = a.amount - b.amount;
           }
           if (diff == 0) {
-            return Date.parse(a.time || "") - Date.parse(b.time || "");
+            return Date.parse(b.time || "") - Date.parse(a.time || "");
           }
           return diff;
-        })[0];
+        })[bids.length - 1];
       }
     };
     $scope.start_sync = function() {
@@ -769,12 +769,12 @@ angular.module('auction').controller('AuctionController',[
     /* 2-WAY INPUT */
     $scope.calculate_bid_temp = function() {
       $rootScope.form.bid_temp = Number(math.fraction(($rootScope.form.bid * 100).toFixed(), 100));
-      $rootScope.form.full_price = $rootScope.form.bid_temp / $scope.bidder_coeficient;
+      $rootScope.form.full_price = $rootScope.form.bid_temp * $scope.bidder_coeficient;
       $log.debug("Set bid_temp:", $rootScope.form);
     };
     $scope.calculate_full_price_temp = function() {
       $rootScope.form.bid = (math.fix((math.fraction($rootScope.form.full_price) * $scope.bidder_coeficient) * 100)) / 100;
-      $rootScope.form.full_price_temp = $rootScope.form.bid / $scope.bidder_coeficient;
+      $rootScope.form.full_price_temp = $rootScope.form.bid * $scope.bidder_coeficient;
     };
     $scope.set_bid_from_temp = function() {
       $rootScope.form.bid = $rootScope.form.bid_temp;
