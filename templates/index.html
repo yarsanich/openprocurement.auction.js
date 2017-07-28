@@ -8,14 +8,16 @@
     <div
       class="list-group-item text-center"
       ng-repeat="auction in auctions">
-      <a ng-if="auction.doc.procurementMethodType.indexOf('esco') >= 0" href="/esco-tenders/{{ auction.doc._id }}">
+      <!--TODO correct procurementMethodType -->
+      <a ng-if="auction.doc.procurementMethodType.indexOf('newDgf') >= 0" href="/dutch-auctions/{{ auction.doc._id }}">
         <h4 class="list-group-item-heading">
-          Тендер {{ auction.doc.tenderID }}
+          Аукціон {{ auction.doc.tenderID }}
         </h4>
       </a>
-      <a ng-if="auction.doc.procurementMethodType.indexOf('esco') === -1" href="/tenders/{{ auction.doc._id }}">
+      <!--TODO correct procurementMethodType -->
+      <a ng-if="auction.doc.procurementMethodType.indexOf('newDgf') === -1" href="/simple-auctions/{{ auction.doc._id }}">
         <h4 class="list-group-item-heading">
-          Тендер {{ auction.doc.tenderID }}
+          Аукціон {{ auction.doc.tenderID }}
         </h4>
       </a>
       <p class="list-group-item-text">
