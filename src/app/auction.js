@@ -10,9 +10,8 @@ var appRequires = [
 
 var db = {},
     bidder_id = "0",
-    db_url = (location.protocol + '//' + location.host + '/auctions/' ) || "",
+    db_url = (location.protocol + '//' + location.host + "/" +  window.db_name ) || "",
     dataLayer = dataLayer || [];
-
 
 angular.module('auction', appRequires)
   .constant('AuctionConfig', {

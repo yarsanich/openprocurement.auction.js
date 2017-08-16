@@ -15,8 +15,8 @@ angular.module('auction').controller('AuctionController',[
       window.open(location.href, '_blank');
       return false;
     }
-
-    AuctionConfig.auction_doc_id = window.location.pathname.replace('/simple-auctions/', '');
+    var parts = window.location.pathname.split('/')
+    AuctionConfig.auction_doc_id = parts[parts.length - 1];
 
     $scope.lang = 'uk';
     $rootScope.normilized = false;
