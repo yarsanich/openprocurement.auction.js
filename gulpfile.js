@@ -28,6 +28,8 @@ const config = JSON.parse(fs.readFileSync('./config.json'));
 const db_name = config.db_name || 'database';
 const app_name = config.app_name || 'acution.js';
 const debug = config.debug || true;
+const main_css = config.main_css || 'bundle.css';
+const name = config.name || 'tender';
 
 
 gulp.task('fonts', () => {
@@ -76,7 +78,7 @@ gulp.task('all-js', ['bower-main'], () => {
 
 gulp.task('css', () => {
     return gulp.src(config.styles)
-	.pipe(concat('bundle.css'))
+	.pipe(concat(main_css))
 	.pipe(cleanCSS())
 	.on('error', interceptErrors)
 	.pipe(gulp.dest(config.buildDir));
@@ -135,14 +137,14 @@ gulp.task('auctionApp', () => {
 		     './src/app/controllers/AuctionCtl.js',
 		     './src/app/controllers/OffCanvasCtl.js',
 		     './src/app/directives/*.js'])
-	.pipe(concat('auction_app_simple.js'))
+	.pipe(concat(app_name))
 	.pipe(gulp.dest(config.buildDir));
 });
 
 
 gulp.task('build', ['all-js', 'css', 'png-images', 'icons', 'htmlPages', 'listingApp', 'archiveApp', 'auctionApp', 'fonts'], () => {
 
-    let css = gulp.src(`${config.buildDir}/bundle.css`)
+    let css = gulp.src(`${config.buildDir}/${main_css}`)
 	.pipe(gulp.dest(config.outDir + '/static/css/'));
 
     let listPage = gulp.src(`${config.buildDir}/index.html`)
@@ -160,7 +162,7 @@ gulp.task('build', ['all-js', 'css', 'png-images', 'icons', 'htmlPages', 'listin
     let archiveApp = gulp.src(`${config.buildDir}/archive_app_simple.js`)
 	.pipe(gulp.dest(config.outDir + '/static/'));
 
-    let auctionPage = gulp.src(`${config.buildDir}/tender.html`)
+    let auctionPage = gulp.src(`${config.buildDir}/${name}.html`)
 	.pipe(gulp.dest(config.outDir));
 
     let auctionApp = gulp.src(`${config.buildDir}/${app_name}`)
