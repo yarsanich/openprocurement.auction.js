@@ -1,4 +1,4 @@
-## Openprocurement Auction CouchApp
+## Openprocurement Auction Software
 
 This package is part of openprocurement auction software
 
