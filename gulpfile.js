@@ -2,6 +2,7 @@ const gulp          = require('gulp'),
       notify        = require('gulp-notify'),
       del           = require('del'),
       concat        = require('gulp-concat'),
+      util          = require('gulp-util'),
       vendorFiles   = require('gulp-main-bower-files'),
       minify        = require('gulp-minify'),
       gulpFilter    = require('gulp-filter'),
@@ -27,7 +28,7 @@ function  interceptErrors(error) {
 const config = JSON.parse(fs.readFileSync('./config.json'));
 const db_name = config.db_name || 'database';
 const app_name = config.app_name || 'acution.js';
-const debug = config.debug || true;
+const devel = ('devel' in config) ? config.devel : true;
 const main_css = config.main_css || 'bundle.css';
 const name = config.name || 'tender';
 
@@ -42,7 +43,7 @@ gulp.task('fonts', () => {
 gulp.task('png-images', () => {
     return gulp.src(config.img.png)
 	.on('error', interceptErrors)
-	.pipe(gulp.dest(config.buildDir));
+	.pipe(gulp.dest(config.buildDir + '/img/'));
 });
 
 
@@ -72,6 +73,7 @@ gulp.task('all-js', ['bower-main'], () => {
 	'./src/lib/puchdb/**/*.js',
     ])
 	.pipe(concat('vendor.js'))
+        .pipe(devel ? util.noop() : uglify())
 	.pipe(gulp.dest(config.buildDir));
 });
 
@@ -83,6 +85,7 @@ gulp.task('css', () => {
 	.on('error', interceptErrors)
 	.pipe(gulp.dest(config.buildDir));
 });
+
 
 gulp.task('htmlPages', () => {
     return merge(config.html.map((page) => {
@@ -114,6 +117,7 @@ gulp.task('listingApp', () => {
 		     './src/app/controllers/ListingCtrl.js'
 		    ])
 	.pipe(concat('index_app_simple.js'))
+        .pipe(devel ? util.noop() : uglify())
 	.pipe(gulp.dest(config.buildDir));
 });
 
@@ -138,6 +142,7 @@ gulp.task('auctionApp', () => {
 		     './src/app/controllers/OffCanvasCtl.js',
 		     './src/app/directives/*.js'])
 	.pipe(concat(app_name))
+        .pipe(devel ? util.noop() : uglify())
 	.pipe(gulp.dest(config.buildDir));
 });
 
@@ -168,20 +173,13 @@ gulp.task('build', ['all-js', 'css', 'png-images', 'icons', 'htmlPages', 'listin
     let auctionApp = gulp.src(`${config.buildDir}/${app_name}`)
 	.pipe(gulp.dest(config.outDir + '/static/'));
 
-    let png = gulp.src("build/*.png")
-	.pipe(gulp.dest(config.outDir + '/static/img/'));
-
-    let icons = gulp.src("build/img/*.png")
+    let images = gulp.src("build/img/*.png")
 	.pipe(gulp.dest(config.outDir+ '/static/img/'));
 
     let fonts = gulp.src("build/fonts/*")
 	.pipe(gulp.dest(config.outDir+'/static/fonts/'));
     
-    let fonts2 = gulp.src("build/fonts/*")
-	.pipe(gulp.dest(config.outDir+'/fonts/'));
-
-
-    return merge(css, png, fonts, vendor_js, listPage, listApp, auctionPage, auctionApp, archivePage, archiveApp, fonts, fonts2, icons);
+    return merge(css, images, fonts, vendor_js, listPage, listApp, auctionPage, auctionApp, archivePage, archiveApp, fonts);
 });
 
 
